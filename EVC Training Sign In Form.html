@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EVC Training Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --evc-green: #2d6a4f;
+    --evc-green-light: #40916c;
+    --evc-green-dark: #1b4332;
+    --evc-mint: #52b788;
+    --evc-sage: #74c69d;
+    --evc-cream: #faf8f4;
+    --evc-warm: #f5f0e8;
+    --warn: #e09f3e;
+    --warn-light: #f4c567;
+    --warn-bg: rgba(224,159,62,0.08);
+    --warn-border: rgba(224,159,62,0.35);
+    --fail: #d64545;
+    --fail-bg: rgba(214,69,69,0.08);
+    --text: #1a2e1a;
+    --text-mid: #3d5a3d;
+    --text-muted: #6b8f6b;
+    --card-bg: #ffffff;
+    --card-border: rgba(45,106,79,0.12);
+    --card-shadow: 0 1px 3px rgba(27,67,50,0.06), 0 8px 24px rgba(27,67,50,0.08);
+    --input-bg: #f7f5f0;
+    --input-border: rgba(45,106,79,0.2);
+    --input-focus: var(--evc-green);
+    --font: 'DM Sans', sans-serif;
+    --serif: 'DM Serif Display', serif;
+    --radius: 14px;
+    --radius-sm: 10px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--evc-cream);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Subtle background texture */
+  .bg-pattern {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse at 10% 0%, rgba(45,106,79,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 100%, rgba(82,183,136,0.05) 0%, transparent 40%);
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    max-width: 500px; margin: 0 auto;
+    padding: 32px 20px 64px;
+  }
+
+  /* ── Header ── */
+  .header { text-align: center; margin-bottom: 28px; }
+  .header .org-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--evc-green-dark);
+    color: var(--evc-sage);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    padding: 8px 18px; border-radius: 100px;
+    margin-bottom: 16px;
+  }
+  .header .org-badge .badge-dot {
+    width: 6px; height: 6px; background: var(--evc-mint);
+    border-radius: 50%;
+    animation: pulse-dot 2s ease infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.7); }
+  }
+  .header h1 {
+    font-family: var(--serif);
+    font-size: 28px; font-weight: 400;
+    color: var(--evc-green-dark);
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+  .header .subtitle {
+    font-size: 13px; color: var(--text-muted);
+    margin-top: 8px; font-weight: 500;
+  }
+
+  /* ── Clock Bar ── */
+  .clock-bar {
+    text-align: center; margin-bottom: 22px;
+    padding: 18px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+  }
+  .clock-bar .clock-label {
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: 1.8px; color: var(--text-muted);
+    margin-bottom: 6px; font-weight: 600;
+  }
+  .clock-bar .clock-time {
+    font-family: var(--serif);
+    font-size: 32px; color: var(--evc-green);
+    letter-spacing: 1px;
+  }
+  .clock-bar .clock-note {
+    font-size: 12px; color: var(--text-muted);
+    margin-top: 6px; font-weight: 500;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    margin-bottom: 18px;
+    box-shadow: var(--card-shadow);
+    animation: fadeUp 0.4s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(10px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+
+  .card-title {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--evc-green-dark);
+    margin-bottom: 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .card-title .icon {
+    width: 32px; height: 32px;
+    background: rgba(45,106,79,0.08);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+
+  /* ── Form Elements ── */
+  .form-group { margin-bottom: 20px; }
+
+  label {
+    display: block;
+    font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  input, select, textarea {
+    background: var(--input-bg);
+    border: 1.5px solid var(--input-border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-family: var(--font);
+    font-size: 16px; font-weight: 500;
+    color: var(--text);
+    outline: none; width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input::placeholder, textarea::placeholder {
+    color: var(--text-muted); font-weight: 400; opacity: 0.6;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--evc-green);
+    box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+    background: #fff;
+  }
+  select {
+    cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='%236b8f6b'%3E%3Cpath d='M0 0l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 34px;
+  }
+  select option { background: #fff; color: var(--text); font-size: 15px; }
+  select optgroup { font-weight: 700; color: var(--text-muted); font-size: 13px; }
+  textarea { resize: vertical; min-height: 60px; font-size: 15px; }
+
+  /* ── Attendance Issue ── */
+  .early-section {
+    margin-top: 6px; padding: 18px;
+    border: 1.5px dashed rgba(224,159,62,0.2);
+    border-radius: 12px;
+    background: transparent;
+    transition: all 0.3s;
+  }
+  .early-section.active {
+    border-color: var(--warn-border);
+    background: var(--warn-bg);
+  }
+  .checkbox-row {
+    display: flex; align-items: center; gap: 12px;
+    cursor: pointer; user-select: none;
+  }
+  .checkbox-row input[type="checkbox"] {
+    width: 22px; height: 22px; accent-color: var(--warn);
+    cursor: pointer; flex-shrink: 0;
+  }
+  .checkbox-row .cb-label {
+    font-size: 14px; font-weight: 600;
+    color: var(--warn); line-height: 1.4;
+  }
+  .early-fields { display: none; margin-top: 14px; }
+  .early-fields.show { display: block; }
+
+  /* ── Submit Button ── */
+  .btn-submit {
+    width: 100%; padding: 18px;
+    background: var(--evc-green);
+    border: none; border-radius: var(--radius-sm);
+    color: #fff; font-family: var(--font);
+    font-size: 16px; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(45,106,79,0.2);
+    margin-top: 12px;
+    letter-spacing: 0.3px;
+  }
+  .btn-submit:hover {
+    background: var(--evc-green-light);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(45,106,79,0.25);
+  }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit:disabled {
+    opacity: 0.5; cursor: not-allowed; transform: none;
+  }
+
+  /* ── Status ── */
+  .status-msg {
+    text-align: center; padding: 14px;
+    border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 600;
+    margin-top: 14px; display: none;
+    line-height: 1.4;
+  }
+  .status-msg.error {
+    display: block;
+    background: var(--fail-bg);
+    border: 1px solid rgba(214,69,69,0.2);
+    color: var(--fail);
+  }
+  .status-msg.sending {
+    display: block;
+    background: rgba(45,106,79,0.06);
+    border: 1px solid rgba(45,106,79,0.15);
+    color: var(--evc-green);
+  }
+
+  /* ══════════════════════════════════════════
+     OVERLAY SYSTEM — Shared base
+     ══════════════════════════════════════════ */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(26,46,26,0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 300;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    /* Transition for smooth entrance/exit */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  .overlay.visible {
+    opacity: 1; visibility: visible;
+  }
+
+  .overlay-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 40px 28px;
+    max-width: 420px; width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(27,67,50,0.15), 0 1px 3px rgba(27,67,50,0.08);
+    /* Slide + scale transition */
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.35s cubic-bezier(0.34,1.4,0.64,1), opacity 0.3s ease;
+    opacity: 0;
+  }
+  .overlay.visible .overlay-card {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  /* ── Overlay: Reminder (warning style) ── */
+  .overlay-card.style-warning {
+    border: 2px solid var(--warn-border);
+  }
+  .overlay-card.style-warning .overlay-icon {
+    width: 56px; height: 56px; margin: 0 auto 18px;
+    background: var(--warn-bg);
+    border: 2px solid rgba(224,159,62,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+  }
+  .overlay-card.style-warning .overlay-title {
+    font-family: var(--font);
+    font-size: 17px; font-weight: 700;
+    color: var(--warn);
+    line-height: 1.5; margin-bottom: 10px;
+  }
+  .overlay-card.style-warning .overlay-sub {
+    font-size: 14px; font-weight: 500;
+    color: var(--text-muted);
+    line-height: 1.6; margin-bottom: 28px;
+  }
+
+  /* ── Overlay: Success style ── */
+  .overlay-card.style-success {
+    border: 2px solid rgba(45,106,79,0.2);
+  }
+  .overlay-card.style-success .overlay-icon {
+    width: 64px; height: 64px; margin: 0 auto 18px;
+    background: rgba(45,106,79,0.08);
+    border: 2px solid rgba(45,106,79,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+  }
+  .overlay-card.style-success h2 {
+    font-family: var(--serif);
+    font-size: 24px; color: var(--evc-green-dark);
+    margin-bottom: 4px;
+  }
+  .overlay-card.style-success .success-time {
+    font-family: var(--serif);
+    font-size: 18px; color: var(--evc-green);
+    margin: 14px 0 4px;
+  }
+  .overlay-card.style-success .success-detail {
+    font-size: 14px; color: var(--text-muted);
+    font-weight: 500; line-height: 1.5;
+  }
+  .overlay-card .divider {
+    width: 50px; height: 2px;
+    background: var(--card-border);
+    margin: 22px auto; border-radius: 2px;
+  }
+  .overlay-card .question-text {
+    font-size: 15px; font-weight: 600;
+    color: var(--text); margin-bottom: 18px;
+  }
+
+  /* ── Overlay: Confirm style ── */
+  .overlay-card.style-confirm {
+    border: 2px solid rgba(45,106,79,0.15);
+  }
+  .overlay-card.style-confirm .overlay-icon {
+    width: 56px; height: 56px; margin: 0 auto 18px;
+    background: rgba(45,106,79,0.08);
+    border: 2px solid rgba(45,106,79,0.12);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  .overlay-card.style-confirm .confirm-title {
+    font-family: var(--serif);
+    font-size: 20px; color: var(--evc-green-dark);
+    margin-bottom: 6px;
+  }
+  .overlay-card.style-confirm .confirm-summary {
+    font-size: 14px; font-weight: 500;
+    color: var(--text-muted);
+    line-height: 1.6; margin-bottom: 8px;
+  }
+  .confirm-detail-grid {
+    text-align: left;
+    background: var(--input-bg);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin: 16px 0 24px;
+  }
+  .confirm-detail-grid .detail-row {
+    display: flex; justify-content: space-between;
+    padding: 6px 0;
+    font-size: 13px;
+  }
+  .confirm-detail-grid .detail-row + .detail-row {
+    border-top: 1px solid rgba(45,106,79,0.06);
+  }
+  .detail-row .detail-label {
+    font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.8px;
+    font-size: 11px;
+  }
+  .detail-row .detail-value {
+    font-weight: 600; color: var(--text);
+    text-align: right; max-width: 60%;
+  }
+
+  /* ── Shared Buttons ── */
+  .overlay-btn {
+    width: 100%; padding: 16px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-family: var(--font);
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+    display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+  }
+  .overlay-btn:hover { transform: translateY(-1px); }
+  .overlay-btn:active { transform: translateY(0); }
+
+  .overlay-btn.btn-primary {
+    background: var(--evc-green);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(45,106,79,0.2);
+  }
+  .overlay-btn.btn-primary:hover {
+    background: var(--evc-green-light);
+    box-shadow: 0 4px 16px rgba(45,106,79,0.25);
+  }
+
+  .overlay-btn.btn-clock {
+    background: var(--evc-green-dark);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(27,67,50,0.2);
+  }
+  .overlay-btn.btn-clock:hover {
+    background: var(--evc-green);
+    box-shadow: 0 4px 16px rgba(27,67,50,0.25);
+  }
+
+  .overlay-btn.btn-ghost {
+    background: transparent;
+    border: 1.5px solid var(--card-border);
+    color: var(--text-muted);
+  }
+  .overlay-btn.btn-ghost:hover {
+    background: var(--input-bg);
+    color: var(--text);
+    border-color: rgba(45,106,79,0.25);
+  }
+
+  .overlay-btn.btn-warn {
+    background: var(--warn);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(224,159,62,0.2);
+  }
+  .overlay-btn.btn-warn:hover {
+    box-shadow: 0 4px 16px rgba(224,159,62,0.3);
+  }
+
+  .btn-group {
+    display: flex; flex-direction: column;
+    gap: 10px;
+  }
+
+  /* ── Countdown lockout on buttons ── */
+  .overlay-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  /* ── Progress indicator inside confirm ── */
+  .progress-dots {
+    display: flex; justify-content: center;
+    gap: 6px; margin-bottom: 22px;
+  }
+  .progress-dots .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--card-border);
+    transition: all 0.3s;
+  }
+  .progress-dots .dot.active {
+    background: var(--evc-green);
+    width: 24px; border-radius: 4px;
+  }
+
+  /* ── Responsive ── */
+  @media(max-width:500px) {
+    .container { padding: 24px 16px 40px; }
+    .card { padding: 24px 18px; }
+    .header h1 { font-size: 24px; }
+    .clock-bar .clock-time { font-size: 28px; }
+    .overlay-card { padding: 32px 20px; }
+    input, select, textarea { font-size: 16px; padding: 14px; }
+    label { font-size: 11px; }
+  }
+  @media(max-width:360px) {
+    .container { padding: 20px 12px 36px; }
+    .card { padding: 20px 14px; }
+    .header h1 { font-size: 22px; }
+    .header .org-badge { font-size: 10px; letter-spacing: 2px; padding: 6px 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-pattern"></div>
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="org-badge">
+      <span class="badge-dot"></span>
+      Emory Valley Center
+    </div>
+    <h1>Training Sign In</h1>
+    <div class="subtitle">HR Program Coordinator: Kyle Mahoney</div>
+  </div>
+
+  <!-- ═══ OVERLAY: Clock-In Reminder ═══ -->
+  <div class="overlay" id="reminderOverlay">
+    <div class="overlay-card style-warning">
+      <div class="overlay-icon">&#9888;&#65039;</div>
+      <div class="overlay-title">If you have access to clock in, you must do so in order to get paid for this training.</div>
+      <div class="overlay-sub">This form only records your attendance &mdash; it does <strong>not</strong> replace clocking in through your timekeeping system.</div>
+      <button class="overlay-btn btn-warn" id="reminderDismissBtn" onclick="dismissReminder()">
+        I Understand &mdash; Continue
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ OVERLAY: Confirm Submission ═══ -->
+  <div class="overlay" id="confirmOverlay">
+    <div class="overlay-card style-confirm">
+      <div class="progress-dots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+      </div>
+      <div class="overlay-icon">&#128203;</div>
+      <div class="confirm-title">Confirm Your Sign In</div>
+      <div class="confirm-summary">Please verify this looks correct before submitting.</div>
+      <div class="confirm-detail-grid" id="confirmDetails">
+        <!-- populated by JS -->
+      </div>
+      <div class="btn-group">
+        <button class="overlay-btn btn-primary" id="confirmSubmitBtn" onclick="doSubmit()">
+          &#10003; Submit Sign In
+        </button>
+        <button class="overlay-btn btn-ghost" onclick="closeConfirm()">
+          &#8592; Go Back &amp; Edit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ OVERLAY: Success + Next Steps ═══ -->
+  <div class="overlay" id="successOverlay">
+    <div class="overlay-card style-success">
+      <div class="progress-dots">
+        <span class="dot"></span>
+        <span class="dot active"></span>
+      </div>
+      <div class="overlay-icon">&#9989;</div>
+      <h2>You're Signed In!</h2>
+      <div class="success-time" id="successTime"></div>
+      <div class="success-detail" id="successDetail"></div>
+      <div class="divider"></div>
+      <div class="question-text">What would you like to do next?</div>
+      <div class="btn-group">
+        <button class="overlay-btn btn-clock" id="clockInBtn" onclick="goClockIn()">
+          &#128176; Clock In to Get Paid
+        </button>
+        <button class="overlay-btn btn-ghost" id="allDoneBtn" onclick="resetForm()">
+          &#10003; All Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ OVERLAY: Clock-In Leaving Confirmation ═══ -->
+  <div class="overlay" id="leaveConfirmOverlay">
+    <div class="overlay-card style-warning">
+      <div class="overlay-icon">&#128279;</div>
+      <div class="overlay-title">Opening Clock-In System</div>
+      <div class="overlay-sub">You'll be taken to <strong>infoservdd.com</strong> in a new tab to clock in. This page will stay open if you need to come back.</div>
+      <div class="btn-group">
+        <button class="overlay-btn btn-clock" onclick="doClockIn()">
+          Open Clock-In Page &#8594;
+        </button>
+        <button class="overlay-btn btn-ghost" onclick="closeOverlay('leaveConfirmOverlay')">
+          &#8592; Go Back
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clock -->
+  <div class="clock-bar">
+    <div class="clock-label">Your arrival time will be recorded as</div>
+    <div class="clock-time" id="liveClock">--:-- --</div>
+    <div class="clock-note">Captured automatically when you submit</div>
+  </div>
+
+  <!-- Main Form -->
+  <div id="formView">
+    <div class="card">
+      <div class="card-title"><div class="icon">&#128203;</div> Sign In</div>
+      <div class="form-group">
+        <label>Training Session</label>
+        <select id="session">
+          <option value="">Select a training...</option>
+          <optgroup label="Certification &amp; Safety">
+            <option value="CPR">CPR</option>
+            <option value="Ukeru">Ukeru</option>
+          </optgroup>
+          <optgroup label="Medication">
+            <option value="Initial Med Training (4 Days)">Initial Med Training (4 Days)</option>
+            <option value="Post Med">Post Med</option>
+            <option value="POMs Training">POMs Training</option>
+          </optgroup>
+          <optgroup label="Direct Care &amp; Skills">
+            <option value="Mealtime">Mealtime</option>
+            <option value="Person Centered Thinking">Person Centered Thinking</option>
+            <option value="Van Lyft Training">Van Lyft Training</option>
+          </optgroup>
+          <optgroup label="Onboarding &amp; Development">
+            <option value="New Employee Orientation">New Employee Orientation</option>
+            <option value="Rising Leaders">Rising Leaders</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Your Full Name</label>
+        <input type="text" id="attendee" placeholder="First and last name">
+      </div>
+      <input type="hidden" id="trainingDate">
+      <div class="form-group">
+        <label>Notes (optional)</label>
+        <textarea id="notes" rows="2" placeholder="Anything management should know"></textarea>
+      </div>
+      <div class="early-section" id="earlySection">
+        <label class="checkbox-row">
+          <input type="checkbox" id="leftEarly" onchange="toggleEarly()">
+          <span class="cb-label">&#9888;&#65039; I have an attendance issue to report</span>
+        </label>
+        <div class="early-fields" id="earlyFields">
+          <div class="form-group" style="margin-top:12px;margin-bottom:0">
+            <label>What happened?</label>
+            <select id="earlyReason">
+              <option value="">Select...</option>
+              <option value="Will need to leave early">Will need to leave early</option>
+              <option value="Arrived late">Arrived late</option>
+              <option value="Could not clock in">Could not clock in</option>
+              <option value="Schedule conflict - partial attendance">Schedule conflict (partial attendance)</option>
+              <option value="Other">Other (explain in notes above)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn-submit" id="submitBtn" onclick="handleSubmit()">&#9998; Sign In</button>
+    </div>
+    <div class="status-msg" id="statusMsg"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// Google Apps Script URL
+// ============================================================
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxZ8CQOcwuCSLrLwAP0MVsozi03uE6korbvfENrNgGRA_cs9Pgp-1tptRQGLz69GUXFA/exec";
+
+// ── Clock ──
+function updateClock() {
+  const now = new Date();
+  let h = now.getHours();
+  const m = now.getMinutes().toString().padStart(2, '0');
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+  document.getElementById('liveClock').textContent = h + ':' + m + ' ' + ampm;
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+// ── Auto-set date ──
+(function() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const mo = (d.getMonth() + 1).toString().padStart(2, '0');
+  const da = d.getDate().toString().padStart(2, '0');
+  document.getElementById('trainingDate').value = y + '-' + mo + '-' + da;
+})();
+
+// ── Overlay helpers ──
+function openOverlay(id) {
+  const el = document.getElementById(id);
+  el.classList.add('visible');
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+}
+
+function closeOverlay(id) {
+  const el = document.getElementById(id);
+  el.classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+// ── Button cooldown: prevents accidental double-taps ──
+function cooldownBtn(btn, seconds) {
+  btn.disabled = true;
+  let remaining = seconds;
+  const originalText = btn.innerHTML;
+  const tick = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(tick);
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  }, 1000);
+}
+
+// ── Reminder popup ──
+function showReminder() {
+  openOverlay('reminderOverlay');
+  const btn = document.getElementById('reminderDismissBtn');
+  btn.disabled = true;
+  let count = 2;
+  btn.innerHTML = 'Please read (' + count + 's)';
+  const timer = setInterval(() => {
+    count--;
+    if (count <= 0) {
+      clearInterval(timer);
+      btn.disabled = false;
+      btn.innerHTML = 'I Understand &mdash; Continue';
+    } else {
+      btn.innerHTML = 'Please read (' + count + 's)';
+    }
+  }, 1000);
+}
+
+function dismissReminder() {
+  closeOverlay('reminderOverlay');
+  setTimeout(() => { document.getElementById('attendee').focus(); }, 350);
+}
+
+// ── Attendance issue toggle ──
+function toggleEarly() {
+  const c = document.getElementById('leftEarly').checked;
+  document.getElementById('earlyFields').classList.toggle('show', c);
+  document.getElementById('earlySection').classList.toggle('active', c);
+}
+
+// ── Status display ──
+function showStatus(msg, type) {
+  const el = document.getElementById('statusMsg');
+  el.className = 'status-msg ' + type;
+  el.innerHTML = msg;
+}
+
+// ── Step 1: Validate → Show Confirmation ──
+function handleSubmit() {
+  const session = document.getElementById('session').value.trim();
+  const attendee = document.getElementById('attendee').value.trim();
+  const leftEarly = document.getElementById('leftEarly').checked ? 'Yes' : 'No';
+  const reason = document.getElementById('leftEarly').checked ? document.getElementById('earlyReason').value : '';
+
+  if (!session || !attendee) {
+    showStatus('Please enter the Training Session and your Name.', 'error');
+    return;
+  }
+  if (leftEarly === 'Yes' && !reason) {
+    showStatus('Please select what happened.', 'error');
+    return;
+  }
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === "YOUR_NEW_DEPLOYMENT_URL_HERE") {
+    showStatus('&#9888;&#65039; Deployment URL not set. See setup guide.', 'error');
+    return;
+  }
+
+  // Clear any previous error
+  document.getElementById('statusMsg').className = 'status-msg';
+  document.getElementById('statusMsg').style.display = 'none';
+
+  // Build confirmation details
+  const now = new Date();
+  let h = now.getHours();
+  const m = now.getMinutes().toString().padStart(2, '0');
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+  const timeStr = h + ':' + m + ' ' + ampm;
+
+  let html = '';
+  html += '<div class="detail-row"><span class="detail-label">Name</span><span class="detail-value">' + escapeHtml(attendee) + '</span></div>';
+  html += '<div class="detail-row"><span class="detail-label">Training</span><span class="detail-value">' + escapeHtml(session) + '</span></div>';
+  html += '<div class="detail-row"><span class="detail-label">Time</span><span class="detail-value">' + timeStr + '</span></div>';
+  if (leftEarly === 'Yes') {
+    html += '<div class="detail-row"><span class="detail-label">Issue</span><span class="detail-value">' + escapeHtml(reason) + '</span></div>';
+  }
+  const notes = document.getElementById('notes').value.trim();
+  if (notes) {
+    html += '<div class="detail-row"><span class="detail-label">Notes</span><span class="detail-value">' + escapeHtml(notes) + '</span></div>';
+  }
+  document.getElementById('confirmDetails').innerHTML = html;
+
+  openOverlay('confirmOverlay');
+
+  // Short cooldown to prevent accidental double-tap
+  const confBtn = document.getElementById('confirmSubmitBtn');
+  confBtn.disabled = true;
+  setTimeout(() => { confBtn.disabled = false; }, 800);
+}
+
+// ── Step 2: Actually submit ──
+function doSubmit() {
+  closeOverlay('confirmOverlay');
+
+  const session = document.getElementById('session').value.trim();
+  const attendee = document.getElementById('attendee').value.trim();
+  const date = document.getElementById('trainingDate').value;
+  const leftEarly = document.getElementById('leftEarly').checked ? 'Yes' : 'No';
+  const reason = document.getElementById('leftEarly').checked ? document.getElementById('earlyReason').value : '';
+  const notes = document.getElementById('notes').value.trim();
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Signing in\u2026';
+  showStatus('&#9203; Recording your arrival\u2026', 'sending');
+
+  const now = new Date();
+  let h = now.getHours();
+  const m = now.getMinutes().toString().padStart(2, '0');
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+  const timeStr = h + ':' + m + ' ' + ampm;
+
+  // Submit via hidden iframe
+  const tempForm = document.createElement('form');
+  tempForm.method = 'POST';
+  tempForm.action = APPS_SCRIPT_URL;
+  tempForm.target = 'hidden_iframe';
+  tempForm.style.display = 'none';
+
+  const fields = { session, attendee, date, leftEarly, reason, notes };
+  for (const [key, value] of Object.entries(fields)) {
+    const input = document.createElement('input');
+    input.type = 'hidden'; input.name = key; input.value = value;
+    tempForm.appendChild(input);
+  }
+  document.body.appendChild(tempForm);
+  tempForm.submit();
+  document.body.removeChild(tempForm);
+
+  let handled = false;
+  function onMessage(event) {
+    if (event.data === 'submission_success' || event.data === 'submission_error') {
+      handled = true;
+      window.removeEventListener('message', onMessage);
+      showSuccess(timeStr, session, attendee);
+    }
+  }
+  window.addEventListener('message', onMessage);
+  setTimeout(function() {
+    if (!handled) {
+      window.removeEventListener('message', onMessage);
+      showSuccess(timeStr, session, attendee);
+    }
+  }, 5000);
+}
+
+// ── Step 3: Show success ──
+function showSuccess(time, session, name) {
+  document.getElementById('successTime').textContent = 'Arrival recorded at ' + time;
+  document.getElementById('successDetail').textContent = name + ' signed in for ' + session;
+
+  // Clear form status
+  document.getElementById('statusMsg').className = 'status-msg';
+  document.getElementById('statusMsg').style.display = 'none';
+
+  openOverlay('successOverlay');
+
+  // Cooldown on buttons to prevent accidental taps
+  const clockBtn = document.getElementById('clockInBtn');
+  const doneBtn = document.getElementById('allDoneBtn');
+  clockBtn.disabled = true;
+  doneBtn.disabled = true;
+  setTimeout(() => {
+    clockBtn.disabled = false;
+    doneBtn.disabled = false;
+  }, 1200);
+}
+
+// ── Clock In flow (with extra confirmation) ──
+function goClockIn() {
+  closeOverlay('successOverlay');
+  setTimeout(() => {
+    openOverlay('leaveConfirmOverlay');
+  }, 300);
+}
+
+function doClockIn() {
+  closeOverlay('leaveConfirmOverlay');
+  window.open('https://infoservdd.com/login/', '_blank');
+  // After a moment, reset form for next person
+  setTimeout(() => { doReset(); }, 600);
+}
+
+// ── Reset ──
+function resetForm() {
+  closeOverlay('successOverlay');
+  setTimeout(() => { doReset(); }, 350);
+}
+
+function doReset() {
+  document.getElementById('attendee').value = '';
+  document.getElementById('notes').value = '';
+  document.getElementById('leftEarly').checked = false;
+  document.getElementById('earlyReason').value = '';
+  document.getElementById('earlyFields').classList.remove('show');
+  document.getElementById('earlySection').classList.remove('active');
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = '\u270E Sign In';
+  document.getElementById('statusMsg').className = 'status-msg';
+  document.getElementById('statusMsg').style.display = 'none';
+  document.getElementById('formView').style.display = 'block';
+  // Show reminder again for next person
+  setTimeout(() => { showReminder(); }, 400);
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ── Init: show reminder on load ──
+showReminder();
+</script>
+</body>
+</html>
